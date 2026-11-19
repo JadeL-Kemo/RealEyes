@@ -1,0 +1,101 @@
+# RealEyes MVP config 鈥?computer eyes (screen + camera), local-first.
+# 璇存槑锛氶粯璁ゅ彧鐢ㄦ湰鍦?8322 缃戝叧锛堥浂 API token锛夈€俢loud 棰勭畻瀛楁浠呬负鍚庣画棰勭暀銆?
+service:
+  name: realeyes
+  data_root: F:\realeyes
+  log_level: INFO
+  status_interval_s: 10
+
+gateway:
+  base_url: http://127.0.0.1:8322/v1
+  api_key_env: QWEN_LOCAL_API_KEY
+  timeout_s: 240
+  model_attention: qwen3.5-9b
+  model_digest: qwen3.5-9b
+
+camera:
+  enabled: true
+  index: 0
+  # source 瑕嗙洊 index锛屾敮鎸佸绉嶈緭鍏ユ簮锛?  #   0                        鏈湴鎽勫儚澶达紙DirectShow锛?  #   window:<鏍囬瀛愪覆>         杩涚▼/绐楀彛鐢婚潰鎹曟崏锛堜緥锛歸indow:鍝斿摡鍝斿摡鐩存挱锛?  #   screen:x,y,w,h           灞忓箷鍖哄煙鎹曟崏
+  #   bilibili:<room_id>       B 绔欑洿鎾祦锛堥渶 ffmpeg 鎷夋祦锛?  #   https://... / rtsp://... 缃戠粶娴侊紙ffmpeg rawvideo 绠￠亾锛?  #   D:\videos\demo.mp4       鏈湴瑙嗛鏂囦欢锛堝惊鐜挱鏀撅紝娴嬭瘯鐢級
+  #   phone                    鎵嬫満 ADB 鎴浘锛堥渶 usb 璋冭瘯鎺堟潈锛?  # source: 0
+  # 褰?source 鏄?window: 鏃讹紝鍙啀瑁佸壀绐楀彛鍐呭尯鍩燂紙鐩稿绐楀彛鐨勫儚绱犲潗鏍囷級
+  # window_crop: {left: 1, top: 217, width: 965, height: 543}
+  width: 1280
+  height: 720
+  fps: 5
+  # 杩愬姩妫€娴嬶細160x90 鐏板害甯т腑鍙樺寲鍍忕礌鍗犳瘮
+  motion_threshold: 0.015
+  motion_min_frames: 3
+  cooldown_s: 60
+  # 鎽勫儚澶寸敾闈㈠叏榛戯紙琚伄鎸?鍏冲揩闂級妫€娴?  blackout_luma: 8
+  blackout_dwell_s: 300
+  # 鐢ㄦ埛閿紶娲昏穬鏃讹紝鐩告満杩愬姩鍙畨闈欒褰曘€佷笉鍋?VLM锛堢渷绠楀姏锛?  away_idle_s: 180
+  # 绂诲紑鏃讹紝澶ц繍鍔紙鍗犳瘮瓒呰繃璇ュ€硷級涔熺洿鎺ヨЕ鍙戝垎鏋?  big_motion: 0.08
+
+screen:
+  enabled: true
+  fps: 0.5
+  blackout_luma: 12
+  blackout_dwell_s: 45
+  blackout_exit_s: 8
+  freeze_dwell_s: 300
+
+attention:
+  enabled: true
+  # 骞惰娉ㄦ剰鍔涳細楂樺彉鍖栫敾闈紙娓告垙/鐩存挱锛夌敤澶氫釜 worker + 澶氭ā鍨嬭疆璇㈠帇浣庢帓闃熷欢杩?  workers: 1
+  model_pool:
+    - qwen3.5-9b
+  max_tokens: 480
+  temperature: 0.1
+  max_calls_per_hour: 120
+  queue_size: 8
+
+# 闈炰汉鑴歌韩浠?鍦ㄥ満鍩虹嚎锛氶敭榧犵┖闂?+ 鍓嶅彴绐楀彛鏍囬锛涙湭鏉ユ帴 OSNet 韬綋 Re-ID
+identity:
+  enabled: true
+  owner_label: owner
+  interval_s: 120
+  away_idle_s: 180
+
+# 鏂囦欢鐩戝惉锛圡VP 绗簩绫讳俊鍙锋簮锛夛細鐩戞帶鐩綍鐨勬柊澧?淇敼鏂囦欢
+filewatch:
+  enabled: true
+  dirs: []
+  # 例如：dirs: ["C:\\Users\\<you>\\Desktop", "D:\\Downloads"]
+  patterns:
+    - "*"
+  interval_s: 60
+  max_files: 5000
+
+heartbeat:
+  enabled: true
+  interval_s: 900
+  camera: true
+  screen: true
+
+digest:
+  hourly: true
+  daily: true
+
+notify:
+  enabled: true
+  min_severity: warning
+
+storage:
+  keep_days: 14
+  min_free_gb: 60
+
+# 棰勭暀锛氭墜鏈?ADB 鎺ュ彛锛堟湭瀹炵幇锛夈€傚惎鐢ㄥ悗鎶?adb/scrcpy 灞忓箷娴佷綔涓虹涓夎矾 source銆?phone:
+  enabled: false
+  adb_serial: ""
+  fps: 1
+
+# 棰勭暀锛氫簯绔崌绾э紙MVP 涓嶅惎鐢級
+cloud:
+  enabled: false
+  base_url: ""
+  model: ""
+  api_key_env: ""
+  warn_per_day: 20
+  cap_per_day: 100

@@ -1,0 +1,66 @@
+# DSH desktop profile additions for the on-box Qwen stack.
+#
+# Target: C:\Users\<you>\.dsh\profiles\desktop\cordis.patch.yml
+# IMPORTANT: patch rows replace `config` wholesale. Merge providers/models into
+# the existing `llm-pi-ai` row instead of overwriting your cloud providers.
+# After editing, fully restart DSH (HMR does not recompose profile plugin rows).
+
+# 1) Provider + models (append under llm-pi-ai > config > providers)
+- id: llm-pi-ai
+  config:
+    providers:
+      qwen-local:
+        displayName: Qwen Local (llama.cpp)
+        apiKeyEnv: QWEN_LOCAL_API_KEY        # set in $DSH_HOME/.env or credentials store
+        api: openai-completions
+        baseURL: http://127.0.0.1:8322/v1
+        compat:
+          supportsDeveloperRole: false
+          maxTokensField: max_tokens
+          chatTemplateKwargs:
+            enable_thinking: false
+        defaultContextWindow: 32768
+        defaultMaxTokens: 4096
+        timeoutMs: 600000
+        models:
+          - id: qwen3.5-9b
+            name: Qwen3.5 9B (local fast, vision)
+            contextWindow: 32768
+            maxTokens: 4096
+            input: [text, image]
+          - id: qwen3.5-35b-a3b
+            name: Qwen3.5 35B-A3B (local balanced)
+            contextWindow: 32768
+            maxTokens: 4096
+          - id: qwen3.8-27b
+            name: Qwen3.8 27B (local strong, vision)
+            contextWindow: 32768
+            maxTokens: 4096
+            input: [text, image]
+
+# 2) Session policy whitelist (append local routes to allowedModels)
+- id: subagent-model-selection-settings
+  name: '@deepseek-ai/dsh-tool-subagent/model-selection-settings'
+  config:
+    enabled: true
+    allowedModels:
+      # ...keep your cloud routes...
+      - { provider: qwen-local, model: qwen3.5-9b }
+      - { provider: qwen3.8-27b, model: qwen3.8-27b }
+      - { provider: qwen-local, model: qwen3.5-35b-a3b }
+
+# 3) Dedicated local delegation tool
+- insert:
+    - id: tool-subagent-local
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: spawn
+        toolName: local_agent
+        modelSelection: true
+        modelDiscovery: true
+        agentOptions: { provider: qwen-local, model: qwen3.5-9b }
+
+# Prerequisite: no incompatible @deepseek-ai/dsh-tool-subagent@0.2.1-rc.3 copy
+# may be hoisted in the profile's node_modules (it is preflight-disabled).
+# Remove the incompatible subagent-claude-code bundle if it drags that version in;
+# then `pnpm install --fix-lockfile` inside the profile directory.

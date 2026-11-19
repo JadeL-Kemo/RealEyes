@@ -1,0 +1,22 @@
+{
+  "name": "dsh-local-eyes",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Give DSH local-only eyes: capture the screen (or a local image file) and ask the on-box Qwen VLM through the llama.cpp gateway, returning text only — zero API tokens.",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dsh-see-now": "^0.2.4"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

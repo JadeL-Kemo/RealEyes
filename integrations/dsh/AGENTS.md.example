@@ -1,0 +1,40 @@
+# Global agent instructions (example — adapt, keep it small)
+
+These instructions load at the start of every session. Project files override details.
+
+## Local model delegation (cheap, on-box work)
+
+A local llama.cpp gateway runs on this machine: `http://127.0.0.1:8322/v1` (OpenAI-compatible, on-demand VRAM).
+It serves three Qwen tiers, reachable through the `local_agent` subagent tool (provider `qwen-local`):
+
+| model | tier | use for |
+|---|---|---|
+| `qwen3.5-9b` | fast, vision | default: bulk/repetitive text work, extraction, summaries, log triage, simple scripts/edits |
+| `qwen3.8-27b` | strong, vision | harder reasoning/coding, careful reading, image understanding |
+| `qwen3.5-35b-a3b` | balanced, no vision | large-context batch work only when VRAM is free; slow prefill, tight VRAM |
+
+Delegate instead of spending own tokens when work is high-volume, mechanical, or low-reasoning.
+Do it yourself when work is ambiguous, architectural, security/destructive, or needs deep codebase context.
+
+- `local_agent`: fully self-contained prompt; ask for compact structured output; verify the result.
+- `local_eyes`: screen/local image → on-box VLM → text only, no API tokens. Default `qwen3.5-9b`;
+  `qwen3.8-27b` only for hard image reasoning. `see_now` hands pixels to the session model (costs tokens).
+- Never delegate destructive, irreversible, credentialed, or user-facing send operations.
+- If the gateway returns 503 or is down, report it; do not silently switch to a cloud model.
+- Subagents (depth > 0) do the work themselves; they do not delegate further.
+
+## Machine rules
+
+- AI artifacts live on `F:` (`F:\models`, `F:\scripts`, `F:\logs`, `F:\platforms`); never on `C:`.
+- Downloads prefer ModelScope; large files: `curl -C -`.
+- New/moved models must be registered in the env registry and `F:\README.md`.
+- Deletions on `F:` go through `F:\.recycle\`.
+- Do not disturb ComfyUI or other GPU users.
+
+## RealEyes 24h vision service
+
+A background watcher runs at login: `F:\scripts\realeyes\` (data in `F:\realeyes\`).
+Events: `F:\realeyes\events\events.jsonl` + SQLite + keyframes; digests in `F:\realeyes\digests\`; desktop notifications for warning+.
+- Status: `F:\realeyes\state\status.json`; start/stop: `start_realeyes.ps1` / `stop_realeyes.ps1`; recall: `realeyes.py --recall <text> --hours 24`.
+- Local-first: L0 rules + local VLM via 8322, no API tokens unless cloud tier is explicitly enabled.
+- Project source of truth: `H:\AgentWorkspace\RealEyes` (docs/SPEC.md, docs/PLAN.md). `F:\scripts\realeyes` is the deployment copy; see PLAN.md before switching.

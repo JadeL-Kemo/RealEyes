@@ -1,0 +1,35 @@
+# Runtime data — never commit
+F:/realeyes/
+realeyes-data/
+data/
+*.db
+*.sqlite
+events/
+digests/
+keyframes/
+
+# Test artifacts (not part of the project)
+docs/evidence/
+src/config.live.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local logs / temp
+*.log
+.tmp-*
+*_stdout.log
+*_stderr.log
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Secrets (never commit credentials)
+.env
+.credentials.yaml
